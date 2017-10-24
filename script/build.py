@@ -19,7 +19,7 @@ from contextlib import contextmanager
 
 CC = "clang"
 CXX = "clang++"
-IS_OFFICIAL_BUILD = False
+IS_OFFICIAL_BUILD = True
 IS_DEBUG = False
 
 
@@ -50,15 +50,40 @@ def sync_deps():
 
 
 def generate_ninja_project():
+    """Generate ninja project with gn command
+
+    This function always generate ninja project in 'third_party/skia/out/Release'
+
+    :return: A CompletedProcess object, check the boolean value
+    """
     with scoped_cwd(get_root_path()):
         os.chdir(os.path.join('third_party', 'skia'))
-        args = "--args='is_debug=false cc=\"clang\" cxx=\"clang++\" is_official_build=true'"
-        command = "bin/gn gen out/Release %s" % args
+        arg_list = []
+
+        if IS_DEBUG is True:
+            arg_list.append("is_debug=true")
+        else:
+            arg_list.append("is_debug=false")
+
+        arg_list.append("cc=\"%s\"" % CC)
+        arg_list.append("cxx=\"%s\"" % CXX)
+
+        if IS_OFFICIAL_BUILD is True:
+            arg_list.append("is_official_build=true")
+        else:
+            arg_list.append("is_official_build=false")
+
+        command = "bin/gn gen out/Release --args='%s'" % (' '.join(arg_list))
         result = subprocess.run(command, shell=True)
+
     return result
 
 
-def build_skia():
+def build_ninja_project():
+    """Build the ninja project generated in 'third_party/skia/out/Release'
+
+    :return: A CompletedProcess object
+    """
     with scoped_cwd(get_root_path()):
         os.chdir(os.path.join('third_party', 'skia'))
         result = subprocess.run(["ninja", "-C", "out/Release"])
@@ -71,7 +96,7 @@ def main():
         return 1
     if not generate_ninja_project():
         return 1
-    if not build_skia():
+    if not build_ninja_project():
         return 1
     return 0
 
