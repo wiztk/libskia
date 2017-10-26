@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-"""The top-level script to setup and build libskia
+"""A python script to build libskia
 
 This script follow the instructions on
 
@@ -14,8 +14,12 @@ to build a static Skia library by the tools provided in depot_tools and skia rep
 import sys
 import os
 import subprocess
+import pathlib
+import tarfile
 
 from contextlib import contextmanager
+from shutil import copy2, rmtree
+from distutils.dir_util import copy_tree
 
 CC = "clang"
 CXX = "clang++"
@@ -90,6 +94,29 @@ def build_ninja_project():
     return result
 
 
+def make_tarball(srcdir, filename):
+    with tarfile.open(filename, 'w:gz') as tar:
+        tar.add(srcdir, arcname=os.path.basename(srcdir))
+
+
+def package():
+    """Package and make a tarball
+    """
+    with scoped_cwd(get_root_path()):
+        tmp_dir = 'out'
+        if os.path.exists(tmp_dir):
+            rmtree(tmp_dir)
+        sub_folder = 'libskia-63'   # TODO: get tag name from git
+        dst = tmp_dir + '/' + sub_folder
+        pathlib.Path(dst + '/lib').mkdir(parents=True, exist_ok=True)
+        pathlib.Path(dst + '/include').mkdir(parents=True, exist_ok=True)
+        copy2('third_party/skia/out/Release/libskia.a', dst + '/lib')
+        copy_tree('third_party/skia/include', dst + '/include')
+
+        os.chdir('out')
+        make_tarball(sub_folder, sub_folder + '.tar.gz')
+
+
 def main():
     set_environment()
     if not sync_deps():
@@ -98,8 +125,10 @@ def main():
         return 1
     if not build_ninja_project():
         return 1
+    package()
     return 0
 
 
 if __name__ == '__main__':
     sys.exit(main())
+
