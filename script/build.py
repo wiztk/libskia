@@ -13,6 +13,7 @@ to build a static Skia library by the tools provided in depot_tools and skia rep
 
 import sys
 import os
+import platform
 import subprocess
 import pathlib
 import tarfile
@@ -25,6 +26,10 @@ CC = "clang"
 CXX = "clang++"
 IS_OFFICIAL_BUILD = True
 IS_DEBUG = False
+
+NAME = 'libskia'
+VERSION = '63'
+ARCH = platform.processor()
 
 
 @contextmanager
@@ -106,7 +111,7 @@ def package():
         tmp_dir = 'out'
         if os.path.exists(tmp_dir):
             rmtree(tmp_dir)
-        sub_folder = 'libskia-63'   # TODO: get tag name from git
+        sub_folder = "%s-%s-%s" % (NAME, VERSION, ARCH)
         dst = tmp_dir + '/' + sub_folder
         pathlib.Path(dst + '/lib').mkdir(parents=True, exist_ok=True)
         pathlib.Path(dst + '/include').mkdir(parents=True, exist_ok=True)
@@ -131,4 +136,3 @@ def main():
 
 if __name__ == '__main__':
     sys.exit(main())
-
