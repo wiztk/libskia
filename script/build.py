@@ -28,7 +28,7 @@ IS_OFFICIAL_BUILD = True
 IS_DEBUG = False
 
 NAME = 'libskia'
-VERSION = 'm63'
+VERSION = 'm64'
 ARCH = platform.processor()
 
 
