@@ -7,8 +7,8 @@ This script follow the instructions on
     - https://skia.org/user/download
     - https://skia.org/user/build
 
-to build a static Skia library by the tools provided in depot_tools and skia repos.
-
+to build a static Skia library by the tools provided in depot_tools and skia
+repos.
 """
 
 import sys
@@ -22,13 +22,15 @@ from contextlib import contextmanager
 from shutil import copy2, rmtree
 from distutils.dir_util import copy_tree
 
+# Global settings:
 CC = "clang"
 CXX = "clang++"
 IS_OFFICIAL_BUILD = True
 IS_DEBUG = False
 
+# Global variables for package name:
 NAME = 'libskia'
-VERSION = 'm64'
+VERSION = 'm66'
 ARCH = platform.processor()
 
 
@@ -61,9 +63,11 @@ def sync_deps():
 def generate_ninja_project():
     """Generate ninja project with gn command
 
-    This function always generate ninja project in 'third_party/skia/out/Release'
+    This function always generate ninja project in
+    'third_party/skia/out/Release'
 
     :return: A CompletedProcess object, check the boolean value
+
     """
     with scoped_cwd(get_root_path()):
         os.chdir(os.path.join('third_party', 'skia'))
