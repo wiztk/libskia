@@ -30,7 +30,7 @@ IS_DEBUG = False
 
 # Global variables for package name:
 NAME = 'libskia'
-VERSION = 'm67'
+VERSION = 'm70'
 ARCH = platform.processor()
 
 
